@@ -79,6 +79,7 @@ class Car(models.Model):
     state = models.CharField(choices=state_choice, max_length=100)
     city = models.CharField(max_length=255)
     color = models.CharField(max_length=255)
+    brand = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255)
     year = models.IntegerField(('year'), choices=year_choices)
     condition = models.CharField(max_length=255)

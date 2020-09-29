@@ -10,10 +10,12 @@ def cars(request):
     paginator = Paginator(cars, 4)
     page = request.GET.get('page')
     paged_cars = paginator.get_page(page)
+    search_fields = Car.objects.values(
+        'brand', 'model', 'city', 'body_style', 'year')
 
     data = {
         'cars': paged_cars,
-        # 'cars': cars,
+        'search_fields': search_fields,
     }
     return render(request, 'cars/cars.html', data)
 
@@ -29,8 +31,42 @@ def car_detail(request, id):
 
 def search(request):
     cars = Car.objects.order_by('-created_date')
+    search_fields = Car.objects.values(
+        'brand', 'model', 'city', 'body_style', 'year', 'transmission')
+
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            cars = cars.filter(description__icontains=keyword)
+
+    if 'brand' in request.GET:
+        brand = request.GET['brand']
+        if brand:
+            cars = cars.filter(brand__iexact=brand)
+
+    if 'model' in request.GET:
+        model = request.GET['model']
+        if model:
+            cars = cars.filter(model__iexact=model)
+
+    if 'city' in request.GET:
+        city = request.GET['city']
+        if city:
+            cars = cars.filter(city__iexact=city)
+
+    if 'year' in request.GET:
+        year = request.GET['year']
+        if year:
+            cars = cars.filter(year__iexact=year)
+
+    if 'min_price' in request.GET:
+        min_price = request.GET['min_price']
+        max_price = request.GET['max_price']
+        if max_price:
+            cars = cars.filter(price__gte=min_price, price__lte=max_price)
 
     data = {
         'cars': cars,
+        'search_fields': search_fields,
     }
     return render(request, 'cars/search.html', data)
